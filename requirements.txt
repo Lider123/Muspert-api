@@ -1,1 +1,4 @@
 bottle==0.12.18
+bottle-log==1.0.0
+firebase-admin==4.3.0
+python-dotenv==0.13.0
