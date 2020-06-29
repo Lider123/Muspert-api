@@ -4,8 +4,13 @@ from dotenv import load_dotenv
 from firebase_admin import auth, credentials
 from firebase_admin._auth_utils import InvalidIdTokenError
 import firebase_admin
+import db
 import os
-import pymysql
+
+HEADER_AUTHORIZATION = "Authorization"
+ENV_HOST = "HOST"
+ENV_PORT = "PORT"
+ENV_GOOGLE_APPLICATION_CREDENTIALS = "GOOGLE_APPLICATION_CREDENTIALS"
 
 load_dotenv()
 app = Bottle()
@@ -14,13 +19,13 @@ app.install(LoggingPlugin(app.config))
 
 @app.get("/api/profile")
 def get_profile():
-    token = request.headers.get("Authorization")
+    token = request.headers.get(HEADER_AUTHORIZATION)
     if token is None:
         response.status = 401
         return "Unauthorized"
-    profile = get_profile_from_db(token)
+    profile = db.get_user_by_token(token)
     if profile is None:
-        profile = create_user(token)
+        profile = db.create_user(token)
         response.status = 201
     return profile
 
@@ -39,46 +44,7 @@ def authorize():
         return "Invalid auth token"
 
 
-def get_profile_from_db(token):
-    connection = create_connection()
-    try:
-        with connection.cursor() as cursor:
-            query = f"""
-            SELECT user_id, nickname, first_name, last_name
-            FROM users
-            WHERE firebase_token = '{token}'
-            """
-            cursor.execute(query)
-            result = cursor.fetchone()
-            return result
-    finally:
-        connection.close()
-
-
-def create_user(token):
-    connection = create_connection()
-    try:
-        with connection.cursor() as cursor:
-            query = f"""
-            INSERT INTO users (firebase_token) VALUES ('{token}')
-            """
-            cursor.execute(query)
-        connection.commit()
-    finally:
-        connection.close()
-    return get_profile_from_db(token)
-
-
-def create_connection():
-    return pymysql.connect(host="localhost",
-                           user="admin",
-                           password="admin",
-                           db="muspert",
-                           charset="utf8mb4",
-                           cursorclass=pymysql.cursors.DictCursor)
-
-
 if __name__ == "__main__":
-    cred = credentials.Certificate(os.getenv('GOOGLE_APPLICATION_CREDENTIALS'))
+    cred = credentials.Certificate(os.getenv(ENV_GOOGLE_APPLICATION_CREDENTIALS))
     firebase_admin.initialize_app(cred)
-    run(app, host="0.0.0.0", port=8080, debug=True)
+    run(app, host=os.getenv(ENV_HOST), port=os.getenv(ENV_PORT), debug=True)
