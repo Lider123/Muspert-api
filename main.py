@@ -5,6 +5,7 @@ from firebase_admin import auth, credentials
 from firebase_admin._auth_utils import InvalidIdTokenError
 import firebase_admin
 import db
+import models
 import os
 
 HEADER_AUTHORIZATION = "Authorization"
@@ -28,6 +29,19 @@ def get_profile():
         profile = db.create_user(token)
         response.status = 201
     return profile
+
+
+@app.post("/api/profile")
+def update_profile():
+    data = request.json
+    try:
+        profile = models.User(**data)
+        db.update_user(profile)
+        response.status = 200
+        return "Success"
+    except:
+        response.status = 400
+        return "Invalid user data"
 
 
 @app.post("/api/authorization")

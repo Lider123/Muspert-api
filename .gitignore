@@ -1,5 +1,6 @@
 venv/
 .idea/
 credentials/
+__pycache__/
 
 .env

@@ -1,3 +1,4 @@
+import models
 import os
 import pymysql
 
@@ -16,7 +17,7 @@ def create_connection():
                            cursorclass=pymysql.cursors.DictCursor)
 
 
-def get_user_by_token(token):
+def get_user_by_token(token: str):
     connection = create_connection()
     try:
         with connection.cursor() as cursor:
@@ -32,7 +33,7 @@ def get_user_by_token(token):
         connection.close()
 
 
-def create_user(token):
+def create_user(token: str):
     connection = create_connection()
     try:
         with connection.cursor() as cursor:
@@ -44,3 +45,22 @@ def create_user(token):
     finally:
         connection.close()
     return get_user_by_token(token)
+
+
+def update_user(user: models.User):
+    connection = create_connection()
+    try:
+        with connection.cursor() as cursor:
+            query = f"""
+                UPDATE users
+                SET
+                    first_name = '{user.first_name}',
+                    last_name = '{user.last_name}',
+                    nickname = '{user.nickname}'
+                WHERE id = {user.id}
+            """
+            cursor.execute(query)
+        connection.commit()
+    finally:
+        connection.close()
+        return
