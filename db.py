@@ -22,7 +22,7 @@ def get_user_by_token(token: str):
     try:
         with connection.cursor() as cursor:
             query = f"""
-                SELECT id, nickname, first_name, last_name
+                SELECT id, nickname, first_name, last_name, avatar
                 FROM users
                 WHERE firebase_token = '{token}'
             """
@@ -56,8 +56,27 @@ def update_user(user: models.User):
                 SET
                     first_name = '{user.first_name}',
                     last_name = '{user.last_name}',
-                    nickname = '{user.nickname}'
+                    nickname = '{user.nickname}',
+                    avatar = '{user.avatar}'
                 WHERE id = {user.id}
+            """
+            cursor.execute(query)
+        connection.commit()
+    finally:
+        connection.close()
+        return
+
+
+def update_avatar(token, path):
+    user = get_user_by_token(token)
+    connection = create_connection()
+    try:
+        with connection.cursor() as cursor:
+            query = f"""
+                UPDATE users
+                SET
+                    avatar = '{path}'
+                WHERE id = {user['id']}
             """
             cursor.execute(query)
         connection.commit()

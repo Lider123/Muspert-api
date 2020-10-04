@@ -4,5 +4,6 @@ User = namedtuple("User", [
     "id",
     "first_name",
     "last_name",
-    "nickname"
+    "nickname",
+    "avatar"
 ])
