@@ -5,6 +5,7 @@ from firebase_admin import auth, credentials
 from firebase_admin._auth_utils import InvalidIdTokenError
 import firebase_admin
 import db
+import json
 import models
 import os
 import utils
@@ -15,6 +16,8 @@ ENV_PORT = "PORT"
 ENV_GOOGLE_APPLICATION_CREDENTIALS = "GOOGLE_APPLICATION_CREDENTIALS"
 DIR_MEDIA = "media"
 DIR_AVATARS = DIR_MEDIA + "/avatars"
+DIR_COVERS = DIR_MEDIA + "/covers"
+DIR_GENRES = DIR_MEDIA + "/genres"
 
 load_dotenv()
 app = Bottle()
@@ -89,9 +92,47 @@ def get_avatar(filename):
     return static_file(filename, DIR_AVATARS)
 
 
+@app.get("/media/covers/<filename>")
+def get_cover(filename):
+    return static_file(filename, DIR_COVERS)
+
+
+@app.get("/media/genres/<filename>")
+def get_cover(filename):
+    return static_file(filename, DIR_GENRES)
+
+
+@app.get("/api/albums")
+def get_albums():
+    token = request.headers.get(HEADER_AUTHORIZATION)
+    if token is None:
+        response.status = 401
+        return "Unauthorized"
+
+    offset = request.query.offset or '0'
+    limit = request.query.limit or "20"
+    albums = db.get_albums(limit, offset)
+    return json.dumps(albums, ensure_ascii=False)
+
+
+@app.get("/api/genres")
+def get_genres():
+    token = request.headers.get(HEADER_AUTHORIZATION)
+    if token is None:
+        response.status = 401
+        return "Unauthorized"
+
+    offset = request.query.offset or '0'
+    limit = request.query.limit or "20"
+    genres = db.get_genres(limit, offset)
+    return json.dumps(genres, ensure_ascii=False)
+
+
 if __name__ == "__main__":
     os.makedirs(os.path.join(os.getcwd(), DIR_MEDIA), exist_ok=True)
     os.makedirs(os.path.join(os.getcwd(), DIR_AVATARS), exist_ok=True)
+    os.makedirs(os.path.join(os.getcwd(), DIR_COVERS), exist_ok=True)
+    os.makedirs(os.path.join(os.getcwd(), DIR_GENRES), exist_ok=True)
     cred = credentials.Certificate(os.getenv(ENV_GOOGLE_APPLICATION_CREDENTIALS))
     firebase_admin.initialize_app(cred)
     run(app, host=os.getenv(ENV_HOST), port=os.getenv(ENV_PORT), debug=True)

@@ -2,5 +2,6 @@ venv/
 .idea/
 credentials/
 __pycache__/
+media/
 
 .env

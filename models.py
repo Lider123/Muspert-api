@@ -7,3 +7,16 @@ User = namedtuple("User", [
     "nickname",
     "avatar"
 ])
+
+Album = namedtuple("Album", [
+    "id",
+    "title",
+    "cover",
+    "createdAt"
+])
+
+Genre = namedtuple("Genre", [
+    "id",
+    "title",
+    "image"
+])

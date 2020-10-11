@@ -83,3 +83,38 @@ def update_avatar(token, path):
     finally:
         connection.close()
         return
+
+
+def get_albums(limit, offset):
+    connection = create_connection()
+    try:
+        with connection.cursor() as cursor:
+            query = f"""
+                SELECT id, title, cover, cast(createdAt as unsigned) AS createdAt
+                FROM albums
+                ORDER BY createdAt DESC
+                LIMIT {limit}
+                OFFSET {offset}
+            """
+            cursor.execute(query)
+            result = cursor.fetchall()
+            return result
+    finally:
+        connection.close()
+
+
+def get_genres(limit, offset):
+    connection = create_connection()
+    try:
+        with connection.cursor() as cursor:
+            query = f"""
+                SELECT id, title, image
+                FROM genres
+                LIMIT {limit}
+                OFFSET {offset}
+            """
+            cursor.execute(query)
+            result = cursor.fetchall()
+            return result
+    finally:
+        connection.close()
