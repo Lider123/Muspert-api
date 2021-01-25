@@ -27,5 +27,6 @@ Track = namedtuple("Track", [
     "link",
     "albumId",
     "cover",
-    "albumTitle"
+    "albumTitle",
+    "artistName"
 ])

@@ -13,7 +13,9 @@ CREATE TABLE `albums` (
   `title` varchar(255) DEFAULT NULL,
   `cover` varchar(255) DEFAULT NULL,
   `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  `artistId` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`artistId`) REFERENCES `artists` (`id`) ON DELETE CASCADE
 )
 
 CREATE TABLE `genres` (
@@ -30,4 +32,10 @@ CREATE TABLE `tracks` (
   `albumId` int(11),
   PRIMARY KEY (`id`),
   FOREIGN KEY (`albumId`) REFERENCES `albums` (`id`) ON DELETE CASCADE
+)
+
+CREATE TABLE `artists` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 )
