@@ -20,3 +20,10 @@ Genre = namedtuple("Genre", [
     "title",
     "image"
 ])
+
+Track = namedtuple("Track", [
+    "id",
+    "title",
+    "link",
+    "albumId"
+])

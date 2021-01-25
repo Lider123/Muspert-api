@@ -118,3 +118,19 @@ def get_genres(limit, offset):
             return result
     finally:
         connection.close()
+
+
+def get_tracks_by_album_id(album_id):
+    connection = create_connection()
+    try:
+        with connection.cursor() as cursor:
+            query = f"""
+                    SELECT id, title, link, albumId
+                    FROM tracks
+                    WHERE albumId = {album_id}
+                """
+            cursor.execute(query)
+            result = cursor.fetchall()
+            return result
+    finally:
+        connection.close()

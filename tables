@@ -22,3 +22,12 @@ CREATE TABLE `genres` (
   `image` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 )
+
+CREATE TABLE `tracks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `link` varchar(255) DEFAULT NULL,
+  `albumId` int(11),
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`albumId`) REFERENCES `albums` (`id`) ON DELETE CASCADE
+)

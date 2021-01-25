@@ -18,6 +18,7 @@ DIR_MEDIA = "media"
 DIR_AVATARS = DIR_MEDIA + "/avatars"
 DIR_COVERS = DIR_MEDIA + "/covers"
 DIR_GENRES = DIR_MEDIA + "/genres"
+DIR_MUSIC = DIR_MEDIA + "/music"
 
 load_dotenv()
 app = Bottle()
@@ -102,7 +103,12 @@ def get_cover(filename):
     return static_file(filename, DIR_GENRES)
 
 
-@app.get("/api/albums")
+@app.get("/media/music/<filename>")
+def get_track(filename):
+    return static_file(filename, DIR_MUSIC)
+
+
+@app.get("/api/catalog/albums")
 def get_albums():
     token = request.headers.get(HEADER_AUTHORIZATION)
     if token is None:
@@ -115,7 +121,7 @@ def get_albums():
     return json.dumps(albums, ensure_ascii=False)
 
 
-@app.get("/api/genres")
+@app.get("/api/catalog/genres")
 def get_genres():
     token = request.headers.get(HEADER_AUTHORIZATION)
     if token is None:
@@ -128,11 +134,28 @@ def get_genres():
     return json.dumps(genres, ensure_ascii=False)
 
 
+@app.get("/api/catalog/tracks")
+def get_tracks():
+    token = request.headers.get(HEADER_AUTHORIZATION)
+    if token is None:
+        response.status = 401
+        return "Unauthorized"
+
+    album_id = request.query.albumId or None
+    if album_id is None:
+        response.status = 400
+        return "Bad request"
+
+    tracks = db.get_tracks_by_album_id(album_id)
+    return json.dumps(tracks, ensure_ascii=False)
+
+
 if __name__ == "__main__":
     os.makedirs(os.path.join(os.getcwd(), DIR_MEDIA), exist_ok=True)
     os.makedirs(os.path.join(os.getcwd(), DIR_AVATARS), exist_ok=True)
     os.makedirs(os.path.join(os.getcwd(), DIR_COVERS), exist_ok=True)
     os.makedirs(os.path.join(os.getcwd(), DIR_GENRES), exist_ok=True)
+    os.makedirs(os.path.join(os.getcwd(), DIR_MUSIC), exist_ok=True)
     cred = credentials.Certificate(os.getenv(ENV_GOOGLE_APPLICATION_CREDENTIALS))
     firebase_admin.initialize_app(cred)
     run(app, host=os.getenv(ENV_HOST), port=os.getenv(ENV_PORT), debug=True)
