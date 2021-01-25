@@ -1,6 +1,6 @@
 bottle==0.12.18
 bottle-log==1.0.0
-cryptography==2.9.2
+cryptography==3.2
 firebase-admin==4.3.0
 pymysql==0.9.3
 python-dotenv==0.13.0
