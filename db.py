@@ -125,9 +125,15 @@ def get_tracks_by_album_id(album_id):
     try:
         with connection.cursor() as cursor:
             query = f"""
-                    SELECT id, title, link, albumId
-                    FROM tracks
-                    WHERE albumId = {album_id}
+                    SELECT
+                        tracks.id AS id,
+                        tracks.title AS title,
+                        tracks.link AS link,
+                        tracks.albumId AS albumId,
+                        albums.cover AS cover,
+                        albums.title AS albumTitle
+                    FROM tracks LEFT JOIN albums ON tracks.albumId = albums.id
+                    WHERE tracks.albumId = {album_id}
                 """
             cursor.execute(query)
             result = cursor.fetchall()
