@@ -90,8 +90,13 @@ def get_albums(limit, offset):
     try:
         with connection.cursor() as cursor:
             query = f"""
-                SELECT id, title, cover, cast(createdAt as unsigned) AS createdAt
-                FROM albums
+                SELECT
+                    albums.id,
+                    albums.title,
+                    albums.cover,
+                    artists.name AS artistName,
+                    cast(albums.createdAt as unsigned) AS createdAt
+                FROM albums LEFT JOIN artists ON albums.artistId = artists.id
                 ORDER BY createdAt DESC
                 LIMIT {limit}
                 OFFSET {offset}

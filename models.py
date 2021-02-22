@@ -12,6 +12,7 @@ Album = namedtuple("Album", [
     "id",
     "title",
     "cover",
+    "artistName",
     "createdAt"
 ])
 
