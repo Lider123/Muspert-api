@@ -30,6 +30,7 @@ CREATE TABLE `tracks` (
   `title` varchar(255) DEFAULT NULL,
   `link` varchar(255) DEFAULT NULL,
   `albumId` int(11),
+  `position` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`albumId`) REFERENCES `albums` (`id`) ON DELETE CASCADE
 )

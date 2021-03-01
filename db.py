@@ -135,11 +135,13 @@ def get_tracks_by_album_id(album_id):
                         tracks.title AS title,
                         tracks.link AS link,
                         tracks.albumId AS albumId,
+                        tracks.position AS position,
                         albums.cover AS cover,
                         albums.title AS albumTitle,
                         artists.name AS artistName
                     FROM tracks LEFT JOIN albums ON tracks.albumId = albums.id LEFT JOIN artists ON albums.artistId = artists.id
                     WHERE tracks.albumId = {album_id}
+                    ORDER BY tracks.position
                 """
             cursor.execute(query)
             result = cursor.fetchall()
