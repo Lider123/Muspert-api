@@ -32,3 +32,7 @@ Track = namedtuple("Track", [
     "artistName",
     "position"
 ])
+
+AddToFavoritesRequest = namedtuple("AddToFavoritesRequest", [
+    "trackId"
+])

@@ -40,3 +40,11 @@ CREATE TABLE `artists` (
   `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 )
+
+CREATE TABLE `favorites` (
+  `userId` int(11) NOT NULL,
+  `trackId` int(11) NOT NULL,
+  PRIMARY KEY (`userId`,`trackId`),
+  FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`trackId`) REFERENCES `tracks` (`id`) ON DELETE CASCADE
+)
