@@ -146,7 +146,50 @@ def get_tracks():
         response.status = 400
         return "Bad request"
 
-    tracks = db.get_tracks_by_album_id(album_id)
+    user = db.get_user_by_token(token)
+    tracks = db.get_tracks_by_album_id(album_id, user["id"])
+    return json.dumps(tracks, ensure_ascii=False)
+
+
+@app.post("/api/favorites")
+def add_to_favorites():
+    data = request.json
+    token = request.headers.get(HEADER_AUTHORIZATION)
+    try:
+        favorites_request = models.AddToFavoritesRequest(**data)
+        user = db.get_user_by_token(token)
+        db.create_favorite(user["id"], favorites_request.trackId)
+        response.status = 200
+        return "Success"
+    except:
+        response.status = 500
+        return "Internal server error"
+
+
+@app.delete("/api/favorites/<track_id>")
+def remove_from_favorites(track_id):
+    token = request.headers.get(HEADER_AUTHORIZATION)
+    try:
+        user = db.get_user_by_token(token)
+        db.delete_favorite(user["id"], track_id)
+        response.status = 200
+        return "Success"
+    except:
+        response.status = 500
+        return "Internal server error"
+
+
+@app.get("/api/catalog/favorites")
+def get_favorite_tracks():
+    token = request.headers.get(HEADER_AUTHORIZATION)
+    if token is None:
+        response.status = 401
+        return "Unauthorized"
+
+    offset = request.query.offset or None
+    limit = request.query.limit or None
+    user = db.get_user_by_token(token)
+    tracks = db.get_favorite_tracks(user["id"], limit, offset)
     return json.dumps(tracks, ensure_ascii=False)
 
 
