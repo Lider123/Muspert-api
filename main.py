@@ -193,6 +193,24 @@ def get_favorite_tracks():
     return json.dumps(tracks, ensure_ascii=False)
 
 
+@app.get("/api/search")
+def search():
+    token = request.headers.get(HEADER_AUTHORIZATION)
+    if token is None:
+        response.status = 401
+        return "Unauthorized"
+
+    query = request.query.query or None
+    if query is None or len(str(query)) < 1:
+        response.status = 400
+        return "Bad request"
+
+    offset = request.query.offset or '0'
+    limit = request.query.limit or "20"
+    albums = db.get_search_results(query, limit, offset)
+    return json.dumps(albums, ensure_ascii=False)
+
+
 if __name__ == "__main__":
     os.makedirs(os.path.join(os.getcwd(), DIR_MEDIA), exist_ok=True)
     os.makedirs(os.path.join(os.getcwd(), DIR_AVATARS), exist_ok=True)

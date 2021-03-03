@@ -213,3 +213,27 @@ def get_favorite_tracks(user_id, limit, offset):
             return result
     finally:
         connection.close()
+
+
+def get_search_results(query, limit, offset):
+    connection = create_connection()
+    try:
+        with connection.cursor() as cursor:
+            query = f"""
+                SELECT
+                    albums.id,
+                    albums.title,
+                    albums.cover,
+                    artists.name AS artistName,
+                    cast(albums.createdAt as unsigned) AS createdAt
+                FROM albums LEFT JOIN artists ON albums.artistId = artists.id
+                WHERE albums.title LIKE '%{query}%'
+                ORDER BY createdAt DESC
+                LIMIT {limit}
+                OFFSET {offset}
+            """
+            cursor.execute(query)
+            result = cursor.fetchall()
+            return result
+    finally:
+        connection.close()
