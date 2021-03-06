@@ -134,6 +134,26 @@ def get_genres():
     return json.dumps(genres, ensure_ascii=False)
 
 
+@app.get("/api/catalog/tracks/<track_id>")
+def get_track(track_id):
+    token = request.headers.get(HEADER_AUTHORIZATION)
+    if token is None:
+        response.status = 401
+        return "Unauthorized"
+
+    if track_id is None:
+        response.status = 400
+        return "Bad request"
+
+    user = db.get_user_by_token(token)
+    track = db.get_track(track_id, user["id"])
+    if track is None:
+        response.status = 404
+        return "Not found"
+
+    return json.dumps(track, ensure_ascii=False)
+
+
 @app.get("/api/catalog/tracks")
 def get_tracks():
     token = request.headers.get(HEADER_AUTHORIZATION)
@@ -149,6 +169,22 @@ def get_tracks():
     user = db.get_user_by_token(token)
     tracks = db.get_tracks_by_album_id(album_id, user["id"])
     return json.dumps(tracks, ensure_ascii=False)
+
+
+@app.get("/api/catalog/tracks/info")
+def get_track_infos():
+    token = request.headers.get(HEADER_AUTHORIZATION)
+    if token is None:
+        response.status = 401
+        return "Unauthorized"
+
+    album_id = request.query.albumId or None
+    if album_id is None:
+        response.status = 400
+        return "Bad request"
+
+    track_infos = db.get_track_infos_by_album_id(album_id)
+    return json.dumps(track_infos, ensure_ascii=False)
 
 
 @app.post("/api/favorites")
@@ -190,6 +226,18 @@ def get_favorite_tracks():
     limit = request.query.limit or None
     user = db.get_user_by_token(token)
     tracks = db.get_favorite_tracks(user["id"], limit, offset)
+    return json.dumps(tracks, ensure_ascii=False)
+
+
+@app.get("/api/catalog/favorites/info")
+def get_favorite_track_infos():
+    token = request.headers.get(HEADER_AUTHORIZATION)
+    if token is None:
+        response.status = 401
+        return "Unauthorized"
+
+    user = db.get_user_by_token(token)
+    tracks = db.get_favorite_track_infos(user["id"])
     return json.dumps(tracks, ensure_ascii=False)
 
 

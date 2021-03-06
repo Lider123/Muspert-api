@@ -154,6 +154,54 @@ def get_tracks_by_album_id(album_id, user_id):
         connection.close()
 
 
+def get_track(track_id, user_id):
+    connection = create_connection()
+    try:
+        with connection.cursor() as cursor:
+            query = f"""
+                SELECT
+                    tracks.id AS id,
+                    tracks.title AS title,
+                    tracks.link AS link,
+                    tracks.albumId AS albumId,
+                    tracks.position AS position,
+                    albums.cover AS cover,
+                    albums.title AS albumTitle,
+                    artists.name AS artistName,
+                    IF(favorites.userId IS NOT NULL, 'true', 'false') AS isFavorite
+                FROM tracks
+                    LEFT JOIN albums ON tracks.albumId = albums.id
+                    LEFT JOIN artists ON albums.artistId = artists.id
+                    LEFT JOIN favorites ON favorites.trackId = tracks.id AND favorites.userId = {user_id}
+                WHERE tracks.id = {track_id}
+                ORDER BY tracks.position
+            """
+            cursor.execute(query)
+            result = cursor.fetchone()
+            return result
+    finally:
+        connection.close()
+
+
+def get_track_infos_by_album_id(album_id):
+    connection = create_connection()
+    try:
+        with connection.cursor() as cursor:
+            query = f"""
+                SELECT
+                    tracks.id AS id,
+                    tracks.position AS 'order'
+                FROM tracks
+                WHERE tracks.albumId = {album_id}
+                ORDER BY tracks.position
+            """
+            cursor.execute(query)
+            result = cursor.fetchall()
+            return result
+    finally:
+        connection.close()
+
+
 def create_favorite(user_id, track_id):
     connection = create_connection()
     try:
@@ -208,6 +256,28 @@ def get_favorite_tracks(user_id, limit, offset):
                 query += f" LIMIT {limit}"
             if offset is not None:
                 query += f" OFFSET {offset}"
+            cursor.execute(query)
+            result = cursor.fetchall()
+            return result
+    finally:
+        connection.close()
+
+
+def get_favorite_track_infos(user_id):
+    connection = create_connection()
+    try:
+        with connection.cursor() as cursor:
+            query = "SET @row_number = 0;"
+            cursor.execute(query)
+            query = f"""
+                SELECT
+                    tracks.id AS id,
+                    @row_number := @row_number + 1 AS 'order'
+                FROM tracks
+                    LEFT JOIN favorites ON favorites.trackId = tracks.id AND favorites.userId = {user_id}
+                WHERE favorites.userId IS NOT NULL
+                ORDER BY favorites.createdAt DESC
+            """
             cursor.execute(query)
             result = cursor.fetchall()
             return result
