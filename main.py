@@ -82,8 +82,10 @@ def upload_avatar():
     file.filename = utils.generate_random_string(32) + "." + extension
     file.save(save_path)
     user = db.get_user_by_token(token)
-    os.remove(os.path.join(os.getcwd(), user["avatar"][1:]))
+    old_avatar_path = os.path.join(os.getcwd(), user["avatar"][1:])
     db.update_avatar(token, "/" + DIR_AVATARS + "/" + file.filename)
+    if os.path.exists(old_avatar_path):
+        os.remove(old_avatar_path)
     response.status = 200
     return "Success"
 
