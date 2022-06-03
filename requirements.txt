@@ -1,4 +1,4 @@
-bottle==0.12.18
+bottle==0.12.20
 bottle-log==1.0.0
 cryptography==36.0.2
 firebase-admin==4.3.0
